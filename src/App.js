@@ -1,24 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Button, FormControl, Input, InputLabel } from "@material-ui/core";
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import firebase from "firebase";
+import Todo from "./Todo";
+
+import db from "./Firebase";
 
 function App() {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState([""]);
+
+  useEffect(() => {
+    db.collection("todos")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        setTodos(
+          snapshot.docs.map((doc) => ({ id: doc.id, todo: doc.data().todo }))
+        );
+      });
+  });
+
+  const addTodo = (event) => {
+    //run add TODO button is clicked
+
+    event.preventDefault(); // stop page from auto reload
+    db.collection("todos").add({
+      todo: input,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    setInput(""); //clear up the input after clicking the button
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      <form>
+        <FormControl>
+          <InputLabel>Write a TODO</InputLabel>
+          <Input
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+          />
+        </FormControl>
+        <Button
+          type="submit"
+          disabled={!input}
+          onClick={addTodo}
+          variant="contained"
+          color="primary"
         >
-          Learn React
-        </a>
-      </header>
+          Add TODO
+        </Button>
+      </form>
+
+      <ul>
+        {todos.map((todo) => (
+          <Todo todo={todo} />
+          // <li>{todo}</li>
+        ))}
+      </ul>
     </div>
   );
 }
