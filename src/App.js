@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import firebase from "firebase";
 import Todo from "./Todo";
-
 import db from "./Firebase";
 
 function App() {
@@ -22,27 +21,27 @@ function App() {
 
   const addTodo = (event) => {
     //run add TODO button is clicked
-
     event.preventDefault(); // stop page from auto reload
     db.collection("todos").add({
       todo: input,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
-
     setInput(""); //clear up the input after clicking the button
   };
 
   return (
-    <div className="App">
-      <form>
-        <FormControl>
-          <InputLabel>Write a TODO</InputLabel>
+    <div className="app">
+      <form className="app__form">
+        <FormControl className="app__input">
+          <InputLabel>Add Todo</InputLabel>
           <Input
             value={input}
             onChange={(event) => setInput(event.target.value)}
           />
         </FormControl>
+
         <Button
+          className="app__button"
           type="submit"
           disabled={!input}
           onClick={addTodo}
@@ -52,7 +51,6 @@ function App() {
           Add TODO
         </Button>
       </form>
-
       <ul>
         {todos.map((todo) => (
           <Todo todo={todo} />
